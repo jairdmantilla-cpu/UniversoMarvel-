@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Marvel Login</title>
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+
+  <div class="barra-auth">
+    <div class="logo">MARVEL</div>
+    <div class="titulo-centro">JAC MARVEL</div>
+    <div class="enlaces"><a href="index.html">Home</a><a href="#">Contact Us</a></div>
+  </div>
+
+  <div class="pantalla-login" style="background-image: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url('img/fondo_login.jpg');">
+    <form class="caja-auth" id="formLogin">
+      <h2>Login</h2>
+      <input type="email" id="correo" placeholder="Correo electrónico" required>
+      <input type="password" id="clave" placeholder="Contraseña" required>
+      <button class="boton-rojo" type="submit">Iniciar</button>
+      <div class="enlaces-caja">
+        <a href="registro.html">¿No tienes cuenta? Crea una cuenta</a>
+        <a href="recuperar.html">¿Olvidaste tu contraseña?</a>
+      </div>
+    </form>
+  </div>
+
+  <script src="js/comun.js"></script>
+  <script>
+    // Lleva a cada tipo de usuario a su página
+    function irSegunRol(rol) {
+      if (rol === "admin" || rol === "admin-content" || rol === "admin-sales") {
+        location.href = "admin.html";
+      } else {
+        location.href = "inicio.html";
+      }
+    }
+
+    function iniciarSesion(correo, clave) {
+      // 1. Primero buscamos entre los administradores
+      for (let i = 0; i < administradores.length; i++) {
+        const admin = administradores[i];
+        if (admin.correo === correo) {
+          if (admin.clave !== clave) {
+            alert("Contraseña incorrecta");
+            return;
+          }
+          guardar("sesion", { rol: admin.rol, usuario: { nombre: correo.split("@")[0], correo: correo } });
+          irSegunRol(admin.rol);
+          return;
+        }
+      }
+
+      // 2. Si no es administrador, buscamos entre los usuarios registrados
+      const usuario = leer("usuarios", {})[correo];
+      if (!usuario) {
+        alert("Usuario no encontrado");
+        return;
+      }
+      if (usuario.clave !== clave) {
+        alert("Contraseña incorrecta");
+        return;
+      }
+      guardar("sesion", { rol: "user", usuario: usuario });
+      irSegunRol("user");
+    }
+
+    document.getElementById("formLogin").addEventListener("submit", function (evento) {
+      evento.preventDefault(); // evita que la página se recargue
+      iniciarSesion(document.getElementById("correo").value.trim(), document.getElementById("clave").value);
+    });
+  </script>
+</body>
+</html>

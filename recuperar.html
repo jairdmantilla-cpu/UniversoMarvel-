@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Recuperar contraseña - Marvel</title>
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+
+  <div class="barra-auth">
+    <div class="logo">MARVEL</div>
+    <div class="titulo-centro">JAC MARVEL</div>
+    <div class="enlaces"><a href="index.html">Home</a><a href="#">Contact Us</a></div>
+  </div>
+
+  <div class="pantalla-centrada" style="background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('img/fondo_marvel.jpg');">
+    <form class="caja-auth" id="formRecuperar" style="text-align:center;">
+      <h2>¿Olvidaste tu contraseña?</h2>
+      <p>Escribe tu correo y te la enviaremos.</p>
+      <input type="email" id="correo" placeholder="Correo electrónico" required>
+      <button class="boton-rojo" type="submit">Enviar</button>
+      <div class="enlaces-caja"><a href="index.html">Regresar al login</a></div>
+    </form>
+  </div>
+
+  <script src="js/comun.js"></script>
+  <script>
+    function enviarRecuperacion(correo) {
+      const usuario = leer("usuarios", {})[correo];
+      if (!usuario) {
+        alert("Este correo no está registrado");
+        return;
+      }
+      const mensaje = "Hola " + usuario.nombre + ", tu contraseña es: " + usuario.clave;
+
+      // Si no se configuró EmailJS (js/comun.js), solo simulamos el envío
+      if (emailjsConfig.publicKey.indexOf("TU_") === 0) {
+        alert("SIMULACIÓN (EmailJS sin configurar)\n\nCorreo enviado a " + correo + ":\n" + mensaje);
+        return;
+      }
+
+      // Envío real con EmailJS (necesita internet)
+      const script = document.createElement("script");
+      script.src = "https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js";
+      script.onload = function () {
+        emailjs.init(emailjsConfig.publicKey);
+        emailjs.send(emailjsConfig.serviceId, emailjsConfig.templateId, { to_email: correo, message: mensaje })
+          .then(function () { alert("Correo enviado correctamente"); })
+          .catch(function () { alert("No se pudo enviar el correo"); });
+      };
+      document.head.appendChild(script);
+    }
+
+    document.getElementById("formRecuperar").addEventListener("submit", function (evento) {
+      evento.preventDefault();
+      enviarRecuperacion(document.getElementById("correo").value.trim());
+    });
+  </script>
+</body>
+</html>
